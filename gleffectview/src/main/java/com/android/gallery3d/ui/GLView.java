@@ -16,6 +16,7 @@
 
 package com.android.gallery3d.ui;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.SystemClock;
@@ -25,7 +26,10 @@ import android.view.MotionEvent;
 import com.android.gallery3d.anim.CanvasAnimation;
 import com.android.gallery3d.anim.StateTransitionAnimation;
 import com.android.gallery3d.common.Utils;
+import com.android.gallery3d.glrenderer.BitmapTexture;
+import com.android.gallery3d.glrenderer.ColorTexture;
 import com.android.gallery3d.glrenderer.GLCanvas;
+import com.android.gallery3d.glrenderer.Texture;
 import com.huwei.gleffectview.util.LogUtil;
 
 import java.util.ArrayList;
@@ -84,6 +88,7 @@ public class GLView {
 
     private int mBackgroundColor;
     private float[] mBackgroundColorFloats;
+    private Texture mBackgroundTexture;
     private StateTransitionAnimation mTransition;
 
     public void startAnimation(CanvasAnimation animation) {
@@ -261,12 +266,20 @@ public class GLView {
 
     public void setBackgroundColor(@ColorInt int color) {
         mBackgroundColor = color;
+        mBackgroundTexture = new ColorTexture(color);
         mBackgroundColorFloats = new float[] {Color.alpha(color), Color.red(color), Color.green(color), Color.blue(color)};
     }
 
+    public void setBackgroundBitmap(Bitmap bitmap) {
+        mBackgroundTexture = new BitmapTexture(bitmap, false);
+    }
+
     protected void renderBackground(GLCanvas view) {
-        if (mBackgroundColorFloats != null) {
-            view.clearBuffer(mBackgroundColorFloats);
+//        if (mBackgroundColorFloats != null) {
+//            view.clearBuffer(mBackgroundColorFloats);
+//        }
+        if (mBackgroundTexture != null) {
+            mBackgroundTexture.draw(view,0 ,0, getWidth(), getHeight());
         }
         if (mTransition != null && mTransition.isActive()) {
             mTransition.applyBackground(this, view);

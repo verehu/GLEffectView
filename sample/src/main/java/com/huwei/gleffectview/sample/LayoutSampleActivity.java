@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.android.gallery3d.anim.AlphaAnimation;
+import com.android.gallery3d.anim.Animation;
 import com.android.gallery3d.ui.GLRootView;
 import com.android.gallery3d.ui.GLView;
 
@@ -38,7 +39,8 @@ public class LayoutSampleActivity extends AppCompatActivity {
 
         AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
         alphaAnimation.setDuration(1000);
-        alphaAnimation.setRepeatCount(5);
+        alphaAnimation.setRepeatCount(Animation.INFINITE);
+        alphaAnimation.setRepeatMode(Animation.REVERSE);
         glView.startAnimation(alphaAnimation);
     }
 }

@@ -17,6 +17,7 @@
 package com.android.gallery3d.anim;
 
 import android.view.animation.Interpolator;
+import android.view.animation.Transformation;
 
 import com.android.gallery3d.common.Utils;
 
@@ -67,6 +68,13 @@ abstract public class Animation {
     public static final int REVERSE = 2;
 
     private long mStartTime = NO_ANIMATION;
+
+    /**
+     * The delay in milliseconds after which the animation must start. When the
+     * start offset is > 0, the start time of the animation is startTime + startOffset.
+     */
+    long mStartOffset;
+
     /**
      * The number of times the animation must repeat. By default, an animation repeats
      * indefinitely.
@@ -83,6 +91,12 @@ abstract public class Animation {
      * {@link #RESTART} or {@link #REVERSE}.
      */
     int mRepeatMode = RESTART;
+
+    /**
+     * Set by  when the animation repeats
+     * in REVERSE mode.
+     */
+    boolean mCycleFlip = false;
 
     private int mDuration;
     private Interpolator mInterpolator;
@@ -106,6 +120,14 @@ abstract public class Animation {
         this.mRepeatCount = repeatCount;
     }
 
+    public long getStartOffset() {
+        return mStartOffset;
+    }
+
+    public void setStartOffset(long mStartOffset) {
+        this.mStartOffset = mStartOffset;
+    }
+
     public void setDuration(int duration) {
         mDuration = duration;
     }
@@ -122,6 +144,10 @@ abstract public class Animation {
         return mStartTime != NO_ANIMATION;
     }
 
+    public boolean isCanceled() {
+        return false;
+    }
+
     public void forceStop() {
         mStartTime = NO_ANIMATION;
     }
@@ -130,18 +156,37 @@ abstract public class Animation {
         if (mStartTime == NO_ANIMATION) return false;
         if (mStartTime == ANIMATION_START) mStartTime = currentTimeMillis;
         boolean more = true;
-        int elapse = (int) (currentTimeMillis - mStartTime);
-        float x = Utils.clamp((float) elapse / mDuration, 0f, 1f);
+
+        final int duration = mDuration;
+        final long startOffset = mStartOffset;
+        float normalizedTime;
+        if (duration != 0) {
+            normalizedTime = ((float) (currentTimeMillis - (mStartTime + startOffset))) /
+                    (float) duration;
+        } else {
+            // time is a step-change with a zero duration
+            normalizedTime = currentTimeMillis < mStartTime ? 0.0f : 1.0f;
+        }
+        final boolean expired = normalizedTime >= 1.0f || isCanceled();
+
+        if (mCycleFlip) {
+            normalizedTime = 1 - normalizedTime;
+        }
+
         Interpolator i = mInterpolator;
-        onCalculate(i != null ? i.getInterpolation(x) : x);
-        if (elapse >= mDuration) {
+        onCalculate(i != null ? i.getInterpolation(normalizedTime) : normalizedTime);
+        if (expired) {
             if (mRepeated == mRepeatCount) {
                 mStartTime = NO_ANIMATION;
 
                 more = false;
             } else {
                 if (mRepeatCount > 0) {
-                    mRepeated ++;
+                    mRepeated++;
+                }
+
+                if (mRepeatMode == REVERSE) {
+                    mCycleFlip = !mCycleFlip;
                 }
 
                 mStartTime = ANIMATION_START;

@@ -16,10 +16,13 @@
 
 package com.android.gallery3d.anim;
 
+import android.util.Log;
+
 import com.android.gallery3d.common.Utils;
 import com.android.gallery3d.glrenderer.GLCanvas;
 
 public class AlphaAnimation extends CanvasAnimation {
+    private static final String TAG = "AlphaAnimation";
     private final float mStartAlpha;
     private final float mEndAlpha;
     private float mCurrentAlpha;
@@ -42,6 +45,8 @@ public class AlphaAnimation extends CanvasAnimation {
 
     @Override
     protected void onCalculate(float progress) {
+        Log.i(TAG, "progress:" + progress);
+
         mCurrentAlpha = Utils.clamp(mStartAlpha
                 + (mEndAlpha - mStartAlpha) * progress, 0f, 1f);
     }

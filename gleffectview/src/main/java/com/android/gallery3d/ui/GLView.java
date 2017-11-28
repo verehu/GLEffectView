@@ -293,11 +293,14 @@ public class GLView {
 
         int xoffset = component.mBounds.left - mScrollX;
         int yoffset = component.mBounds.top - mScrollY;
-
         canvas.translate(xoffset, yoffset);
 
         CanvasAnimation anim = component.mAnimation;
         if (anim != null) {
+            if (!anim.isInitialized()) {
+                anim.initialize(component.getWidth(), component.getHeight(), getWidth(), getHeight());
+            }
+
             canvas.save(anim.getCanvasSaveFlags());
             if (anim.calculate(AnimationTime.get())) {
                 invalidate();

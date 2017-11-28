@@ -21,6 +21,10 @@ import android.view.animation.Transformation;
 
 import com.android.gallery3d.common.Utils;
 
+import static android.view.animation.Animation.ABSOLUTE;
+import static android.view.animation.Animation.RELATIVE_TO_PARENT;
+import static android.view.animation.Animation.RELATIVE_TO_SELF;
+
 // Animation calculates a value according to the current input time.
 //
 // 1. First we need to use setDuration(int) to set the duration of the
@@ -69,6 +73,13 @@ abstract public class Animation {
 
     private long mStartTime = NO_ANIMATION;
 
+    private boolean mMore = true;
+    /**
+     * This value must be set to true by {@link #initialize(int, int, int, int)}. It
+     * indicates the animation was successfully initialized and can be played.
+     */
+    boolean mInitialized = false;
+
     /**
      * The delay in milliseconds after which the animation must start. When the
      * start offset is > 0, the start time of the animation is startTime + startOffset.
@@ -100,6 +111,16 @@ abstract public class Animation {
 
     private int mDuration;
     private Interpolator mInterpolator;
+
+    /**
+     * Whether or not the animation has been initialized.
+     *
+     * @return Has this animation been initialized.
+     * @see #initialize(int, int, int, int)
+     */
+    public boolean isInitialized() {
+        return mInitialized;
+    }
 
     public void setInterpolator(Interpolator interpolator) {
         mInterpolator = interpolator;
@@ -152,10 +173,69 @@ abstract public class Animation {
         mStartTime = NO_ANIMATION;
     }
 
+    /**
+     * Reset the initialization state of this animation.
+     *
+     * @see #initialize(int, int, int, int)
+     */
+    public void reset() {
+//        mPreviousRegion.setEmpty();
+//        mPreviousTransformation.clear();
+        mInitialized = false;
+        mCycleFlip = false;
+        mRepeated = 0;
+        mMore = true;
+//        mOneMoreTime = true;
+//        mListenerHandler = null;
+    }
+
+    /**
+     * Initialize this animation with the dimensions of the object being
+     * animated as well as the objects parents. (This is to support animation
+     * sizes being specified relative to these dimensions.)
+     * <p>
+     * <p>Objects that interpret Animations should call this method when
+     * the sizes of the object being animated and its parent are known, and
+     * before calling {@link #calculate}.
+     *
+     * @param width        Width of the object being animated
+     * @param height       Height of the object being animated
+     * @param parentWidth  Width of the animated object's parent
+     * @param parentHeight Height of the animated object's parent
+     */
+    public void initialize(int width, int height, int parentWidth, int parentHeight) {
+        reset();
+        mInitialized = true;
+    }
+
+    /**
+     * Convert the information in the description of a size to an actual
+     * dimension
+     *
+     * @param type       One of Animation.ABSOLUTE, Animation.RELATIVE_TO_SELF, or
+     *                   Animation.RELATIVE_TO_PARENT.
+     * @param value      The dimension associated with the type parameter
+     * @param size       The size of the object being animated
+     * @param parentSize The size of the parent of the object being animated
+     * @return The dimension to use for the animation
+     */
+    protected float resolveSize(int type, float value, int size, int parentSize) {
+        switch (type) {
+            case ABSOLUTE:
+                return value;
+            case RELATIVE_TO_SELF:
+                return size * value;
+            case RELATIVE_TO_PARENT:
+                return parentSize * value;
+            default:
+                return value;
+        }
+    }
+
     public boolean calculate(long currentTimeMillis) {
         if (mStartTime == NO_ANIMATION) return false;
         if (mStartTime == ANIMATION_START) mStartTime = currentTimeMillis;
-        boolean more = true;
+
 
         final int duration = mDuration;
         final long startOffset = mStartOffset;
@@ -179,7 +259,7 @@ abstract public class Animation {
             if (mRepeated == mRepeatCount) {
                 mStartTime = NO_ANIMATION;
 
-                more = false;
+                mMore = false;
             } else {
                 if (mRepeatCount > 0) {
                     mRepeated++;
@@ -192,7 +272,7 @@ abstract public class Animation {
                 mStartTime = ANIMATION_START;
             }
         }
-        return more;
+        return mMore;
     }
 
     abstract protected void onCalculate(float progress);

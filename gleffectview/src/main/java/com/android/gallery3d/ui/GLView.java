@@ -274,6 +274,15 @@ public class GLView {
         mBackgroundTexture = new BitmapTexture(bitmap, false);
     }
 
+    /**
+     * 绘制中心点  调试使用
+     * @param canvas
+     */
+    private void renderCenter(GLCanvas canvas) {
+        ColorTexture colorTexture = new ColorTexture(Color.RED);
+        colorTexture.draw(canvas, getWidth()/2 - 5, getHeight()/2 - 5, 10, 10);
+    }
+
     protected void renderBackground(GLCanvas view) {
 //        if (mBackgroundColorFloats != null) {
 //            view.clearBuffer(mBackgroundColorFloats);

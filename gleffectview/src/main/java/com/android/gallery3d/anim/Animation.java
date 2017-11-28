@@ -74,11 +74,7 @@ abstract public class Animation {
     private long mStartTime = NO_ANIMATION;
 
     private boolean mMore = true;
-    /**
-     * This value must be set to true by {@link #initialize(int, int, int, int)}. It
-     * indicates the animation was successfully initialized and can be played.
-     */
-    boolean mInitialized = false;
+
 
     /**
      * The delay in milliseconds after which the animation must start. When the
@@ -112,15 +108,7 @@ abstract public class Animation {
     private int mDuration;
     private Interpolator mInterpolator;
 
-    /**
-     * Whether or not the animation has been initialized.
-     *
-     * @return Has this animation been initialized.
-     * @see #initialize(int, int, int, int)
-     */
-    public boolean isInitialized() {
-        return mInitialized;
-    }
+
 
     public void setInterpolator(Interpolator interpolator) {
         mInterpolator = interpolator;
@@ -181,7 +169,6 @@ abstract public class Animation {
     public void reset() {
 //        mPreviousRegion.setEmpty();
 //        mPreviousTransformation.clear();
-        mInitialized = false;
         mCycleFlip = false;
         mRepeated = 0;
         mMore = true;
@@ -189,24 +176,6 @@ abstract public class Animation {
 //        mListenerHandler = null;
     }
 
-    /**
-     * Initialize this animation with the dimensions of the object being
-     * animated as well as the objects parents. (This is to support animation
-     * sizes being specified relative to these dimensions.)
-     * <p>
-     * <p>Objects that interpret Animations should call this method when
-     * the sizes of the object being animated and its parent are known, and
-     * before calling {@link #calculate}.
-     *
-     * @param width        Width of the object being animated
-     * @param height       Height of the object being animated
-     * @param parentWidth  Width of the animated object's parent
-     * @param parentHeight Height of the animated object's parent
-     */
-    public void initialize(int width, int height, int parentWidth, int parentHeight) {
-        reset();
-        mInitialized = true;
-    }
 
     /**
      * Convert the information in the description of a size to an actual

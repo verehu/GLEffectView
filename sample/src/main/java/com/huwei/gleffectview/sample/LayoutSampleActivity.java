@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.android.gallery3d.anim.AlphaAnimation;
 import com.android.gallery3d.anim.Animation;
+import com.android.gallery3d.anim.ScaleAnimation;
 import com.android.gallery3d.anim.TranslateAnimation;
 import com.android.gallery3d.ui.GLRootView;
 import com.android.gallery3d.ui.GLView;
@@ -41,7 +42,7 @@ public class LayoutSampleActivity extends AppCompatActivity {
         mGLRootView.setContentPane(panelGLView);
 
         AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(3000);
         alphaAnimation.setRepeatCount(Animation.INFINITE);
         alphaAnimation.setRepeatMode(Animation.REVERSE);
         glView.startAnimation(alphaAnimation);
@@ -52,9 +53,20 @@ public class LayoutSampleActivity extends AppCompatActivity {
         glView.layout(500, 500, 500 + 200, 500 + 200);
 
         TranslateAnimation translateAnimation = new TranslateAnimation(500, 800, 500, 800);
-        translateAnimation.setDuration(1000);
+        translateAnimation.setDuration(2000);
         translateAnimation.setRepeatCount(Animation.INFINITE);
         translateAnimation.setRepeatMode(Animation.REVERSE);
         glView.startAnimation(translateAnimation);
+
+        glView = new GLView();
+        glView.setBackgroundColor(Color.GREEN);
+        panelGLView.addComponent(glView);
+        glView.layout(200, 800, 200 + 100, 800 + 100);
+
+        ScaleAnimation scaleAnimation = new ScaleAnimation(1f, 3f, 1f, 3f, 50, 50);
+        scaleAnimation.setDuration(1000);
+        scaleAnimation.setRepeatCount(Animation.INFINITE);
+        scaleAnimation.setRepeatMode(Animation.REVERSE);
+        glView.startAnimation(scaleAnimation);
     }
 }

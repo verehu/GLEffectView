@@ -38,6 +38,7 @@ public class LayoutSampleActivity extends AppCompatActivity {
 
         AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
         alphaAnimation.setDuration(1000);
+        alphaAnimation.setRepeatCount(5);
         glView.startAnimation(alphaAnimation);
     }
 }
